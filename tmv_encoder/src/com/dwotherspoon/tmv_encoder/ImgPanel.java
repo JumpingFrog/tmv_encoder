@@ -2,8 +2,9 @@ package com.dwotherspoon.tmv_encoder;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-
 import javax.swing.JComponent;
+
+/* Simple class for displaying an image on a swing form. */
 
 public class ImgPanel extends JComponent {
 	 private BufferedImage img;

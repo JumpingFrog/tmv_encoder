@@ -1,6 +1,9 @@
 package com.dwotherspoon.tmv_encoder;
 
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
@@ -8,6 +11,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
 import javax.swing.JButton;
+import javax.swing.JTextPane;
+import javax.swing.border.LineBorder;
+
+/* The GUI for TMV Encoder */
 
 public class TMVgui {
 	private JFrame window;
@@ -17,6 +24,7 @@ public class TMVgui {
 	private ImgPanel sframe;
 	private ImgPanel oframe;
 	private JProgressBar pbar;
+	private JTextPane console;
 	
 	public TMVgui() { //build the gui
 		window = new JFrame("TMV Encoder");
@@ -29,7 +37,25 @@ public class TMVgui {
 		mbar.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
 		iopen = new JMenuItem("Open");
+		iopen.addActionListener(new ActionListener () {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				open();
+			}
+			
+		});
+		
 		iabout = new JMenuItem("About");
+		iabout.addActionListener(new ActionListener () {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 		
 		mbar.add(iopen);
 		mbar.add(iabout);
@@ -47,10 +73,31 @@ public class TMVgui {
 		pbar.setSize(680, 25);
 		pbar.setStringPainted(true);
 		
+		console = new JTextPane();
+		console.setBorder(new LineBorder(Color.gray, 2));
+		console.setEditable(false);
+		console.setSize(680, 300);
+		console.setLocation(20, 280);
+		console.setText("TMV Encoder (Java) Loaded...");
+		
 		window.setJMenuBar(mbar);
 		window.add(sframe);
 		window.add(oframe);
 		window.add(pbar);
+		window.add(console);
 		window.setVisible(true);
+		
+	}
+	
+	private void open() {
+		JFileChooser chooser = new JFileChooser();
+		if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
+			writeConsole("Attempting to open: " + chooser.getSelectedFile().getName());
+			new Decode(chooser.getSelectedFile().getAbsolutePath());
+		}
+	}
+	
+	public void writeConsole(String text) {
+		console.setText(console.getText() + '\n' + text);
 	}
 }
