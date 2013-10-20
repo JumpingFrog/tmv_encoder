@@ -14,6 +14,11 @@ public class ImgPanel extends JComponent {
 		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 	}
 	 
+	 public void setImage(BufferedImage im) {
+		 img = im;
+		 super.repaint();
+	 }
+	 
 	 @Override
 	public void paint(Graphics g) {
 		super.paint(g);

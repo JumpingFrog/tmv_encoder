@@ -14,9 +14,12 @@ import javax.swing.JButton;
 import javax.swing.JTextPane;
 import javax.swing.border.LineBorder;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /* The GUI for TMV Encoder */
 
-public class TMVgui {
+public class TMVGui {
 	private JFrame window;
 	private JMenuBar mbar;
 	private JMenuItem iopen;
@@ -26,9 +29,9 @@ public class TMVgui {
 	private JProgressBar pbar;
 	private JTextPane console;
 	
-	public TMVgui() { //build the gui
+	public TMVGui() { //build the gui
 		window = new JFrame("TMV Encoder");
-		window.setSize(720,800);
+		window.setSize(720,700);
 		window.setResizable(false);
 		window.setLayout(null);
 		
@@ -93,7 +96,10 @@ public class TMVgui {
 		JFileChooser chooser = new JFileChooser();
 		if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 			writeConsole("Attempting to open: " + chooser.getSelectedFile().getName());
-			new Decode(chooser.getSelectedFile().getAbsolutePath());
+			Decode video = new Decode(chooser.getSelectedFile().getAbsolutePath());
+			
+
+			
 		}
 	}
 	

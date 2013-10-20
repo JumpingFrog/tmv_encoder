@@ -11,7 +11,7 @@ public class Main {
 			System.out.println("TMV Encoder started, to run as gui please relaunch without arugments.");
 		}
 		else { //load the gui
-			new TMVgui();
+			new TMVGui();
 		}
 	}
 	
