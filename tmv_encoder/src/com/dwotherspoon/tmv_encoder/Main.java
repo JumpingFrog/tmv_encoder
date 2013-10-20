@@ -7,7 +7,12 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		if (args.length > 0) { //some stuff for headless
+			
+		}
+		else { //load the gui
+			new TMVgui();
+		}
 	}
 
 }
