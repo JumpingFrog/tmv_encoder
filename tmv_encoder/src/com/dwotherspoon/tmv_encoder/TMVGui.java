@@ -28,6 +28,7 @@ public class TMVGui {
 	private ImgPanel oframe;
 	private JProgressBar pbar;
 	private JTextPane console;
+	private JButton encbut;
 	
 	public TMVGui() { //build the gui
 		window = new JFrame("TMV Encoder");
@@ -83,11 +84,27 @@ public class TMVGui {
 		console.setLocation(20, 280);
 		console.setText("TMV Encoder (Java) Loaded...");
 		
+		encbut = new JButton();
+		encbut.setLocation(20,590);
+		encbut.setSize(300, 25);
+		encbut.setText("Encode");
+		encbut.setEnabled(false);
+		encbut.addActionListener( new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
 		window.setJMenuBar(mbar);
 		window.add(sframe);
 		window.add(oframe);
 		window.add(pbar);
 		window.add(console);
+		window.add(encbut);
 		window.setVisible(true);
 		
 	}
@@ -97,15 +114,17 @@ public class TMVGui {
 		if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 			writeConsole("Attempting to open: " + chooser.getSelectedFile().getName());
 			Decode video = new Decode(chooser.getSelectedFile().getAbsolutePath());
+			encbut.setEnabled(true);
 			XuggleFrame f;
-			f = video.getFrame();
-			if (f instanceof XuggleVFrame) {
-				
-			}
-			else {
-				
-			}
 			
+			while ((f = video.getFrame()) != null) {
+				if (f instanceof XuggleVFrame) {
+					sframe.setImage(((XuggleVFrame) f).getImage());
+				}
+				else {
+					
+				}
+			}
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package com.dwotherspoon.tmv_encoder;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import com.xuggle.xuggler.IAudioSamples;
@@ -86,15 +87,19 @@ public class Decode {
    }
 	
 	
-	public XuggleVFrame getFrame() { //https://github.com/artclarke/xuggle-xuggler/blob/master/src/com/xuggle/xuggler/demos/DecodeAndPlayAudioAndVideo.java
+	public XuggleFrame getFrame() { //https://github.com/artclarke/xuggle-xuggler/blob/master/src/com/xuggle/xuggler/demos/DecodeAndPlayAudioAndVideo.java
 		int val = 0;
 		while (val >= 0) {
 				if (pkt.getStreamIndex() == vidID) { //is packet a video?
 					picture = IVideoPicture.make(vidStream.getPixelType(), vidStream.getWidth(), vidStream.getHeight());
 					 while (offset < pkt.getSize()) { //loop until we've got the whole packet read
 						 offset += vidStream.decodeVideo(picture, pkt, offset);
-						 if (picture.isComplete()) { //complete frame get.
-							 return new XuggleVFrame(picture.getTimeStamp(), converter.toImage(picture));
+						 if (picture.isComplete()) { //complete frame get - resize and return.
+							 cur_frame = new BufferedImage(320, 200, BufferedImage.TYPE_3BYTE_BGR);
+							 Graphics g = cur_frame.getGraphics();
+							 g.drawImage(converter.toImage(picture), 0, 0, 320, 200, null);
+							 g.dispose();
+							 return new XuggleVFrame(picture.getTimeStamp(), cur_frame);
 						 }
 					 }
 				}
@@ -104,7 +109,7 @@ public class Decode {
 					while (offset < pkt.getSize()) {
 						offset += audStream.decodeAudio(samples, pkt, offset);
 						if (samples.isComplete()) {
-							return null;
+							return new XuggleAFrame(samples.getTimeStamp());
 						}
 					}
 				}
@@ -116,6 +121,10 @@ public class Decode {
 	
 	public double getFrameRate() {
 		return vidStream.getFrameRate().getDouble();
+	}
+	
+	public int getSampleRate() {
+		return audStream.getSampleRate();
 	}
 	
 	public IStreamCoder getAudio() {

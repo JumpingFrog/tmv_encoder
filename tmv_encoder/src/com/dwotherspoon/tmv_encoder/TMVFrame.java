@@ -13,6 +13,10 @@ public class TMVFrame {
 		cells[n].setBackground(background);
 	}
 	
+	public void setCell(int n, Cell c) {
+		cells[n] = c;
+	}
+	
 	public Cell getCell(int n) {
 		return cells[n];
 	}
