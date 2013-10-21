@@ -97,8 +97,14 @@ public class TMVGui {
 		if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 			writeConsole("Attempting to open: " + chooser.getSelectedFile().getName());
 			Decode video = new Decode(chooser.getSelectedFile().getAbsolutePath());
-			
-
+			XuggleFrame f;
+			f = video.getFrame();
+			if (f instanceof XuggleVFrame) {
+				
+			}
+			else {
+				
+			}
 			
 		}
 	}

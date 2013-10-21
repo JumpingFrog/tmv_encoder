@@ -1,10 +1,18 @@
 package com.dwotherspoon.tmv_encoder;
 
+import java.awt.image.BufferedImage;
+
+import com.xuggle.xuggler.IVideoPicture;
+
 public final class XuggleVFrame extends XuggleFrame {
-
-	public XuggleVFrame(long ts) {
+	private BufferedImage img;
+		
+	public XuggleVFrame(long ts, BufferedImage i) {
 		super(ts);
-		// TODO Auto-generated constructor stub
+		img = i;
 	}
-
+	
+	public BufferedImage getImage() {
+		return img;
+	}
 }
