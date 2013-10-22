@@ -1,5 +1,7 @@
 package com.dwotherspoon.tmv_encoder;
 
+/* A data structure for TMV video frames */
+
 public class TMVFrame {
 	private Cell[] cells;
 	
