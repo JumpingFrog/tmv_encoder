@@ -2,11 +2,11 @@ package com.dwotherspoon.tmv_encoder;
 
 /* Simple data type for representing encoded cells */
 public class Cell {
-	private byte cha;
+	private int cha;
 	private byte foreground;
 	private byte background;
 	
-	public byte getCha() {
+	public int getCha() {
 		return cha;
 	}
 	
@@ -18,7 +18,7 @@ public class Cell {
 		return background;
 	}
 	
-	public void setCha(byte i) {
+	public void setCha(int i) {
 		cha = i;
 	}
 	

@@ -2,9 +2,16 @@ package com.dwotherspoon.tmv_encoder;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JFileChooser;
@@ -113,20 +120,71 @@ public class TMVGui {
 		JFileChooser chooser = new JFileChooser();
 		if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 			writeConsole("Attempting to open: " + chooser.getSelectedFile().getName());
-			Decode video = new Decode(chooser.getSelectedFile().getAbsolutePath());
+			//Decode video = new Decode(chooser.getSelectedFile().getAbsolutePath());
 			encbut.setEnabled(true);
-			XuggleFrame f;
-			
-			while ((f = video.getFrame()) != null) {
-				if (f instanceof XuggleVFrame) {
-					sframe.setImage(((XuggleVFrame) f).getImage());
+			//XuggleFrame f = video.getFrame();
+			BufferedImage in = new BufferedImage(320,200, BufferedImage.TYPE_3BYTE_BGR);
+			Graphics g = in.getGraphics();
+				BufferedImage tempi;
+				try {
+					tempi = ImageIO.read(chooser.getSelectedFile());
+
+					g.drawImage(tempi, 0,0,320,200,null);
+					g.dispose();
+					sframe.setImage(in); //hacked together for testing
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
 				}
-				else {
-					
+			
+				
+				ConcurrentLinkedQueue<UCell> togo = new ConcurrentLinkedQueue<UCell>();
+				int[] buf = new int[64];
+				for (int row = 0; row < 25; row++) { //split the image
+					for (int col = 0; col < 40; col++) {
+						for (int y = 0; y < 8; y++) {
+							for (int x =0; x< 8; x++) {
+								buf[(y*8)+x] = (in.getRGB((col*8)+x, (row*8)+y) & 0x00FFFFFF); //AND removes alpha channel.
+								//System.out.println((y*8)+x + " : " + buf[(y*8)+x]);
+							}
+						}
+						togo.add(new UCell(buf, (row*40)+col ));
+					}
+				}
+				TMVFrame back = new TMVFrame();
+				InputStream font_in;
+				boolean[][] font = new boolean[256][64];
+				try {
+					font_in = new FileInputStream("font.bin");
+					int temp = 0;
+					int mask = 0;
+					for (int cha = 0; cha < 256; cha++) { //read font table
+						for (int row = 0; row < 8; row++) {
+							temp = font_in.read();
+							for (int col = 7; col >= 0; col--) {
+								mask = (128 >> col); //bit mask reverses endian
+								mask &= temp;
+								font[cha][(row*8) + col] = (mask != 0);
+							}
+						}
+					}
+				} catch (Exception e1)  {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				
+				try {
+					Thread test = new Thread(new Worker(togo, back));
+					test.run();
+					while (test.isAlive()) {
+					}
+					oframe.setImage(back.render(font));
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
-	}
 	
 	public void writeConsole(String text) {
 		console.setText(console.getText() + '\n' + text);

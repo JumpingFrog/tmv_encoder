@@ -16,8 +16,10 @@ public class Worker implements Runnable {
 	private TMVFrame result;
 	private int threshold = 60;
 	private boolean[][] font;
+	private ColC[] fcols;
+	private boolean working = false;;
 	
-	  private int[] colours = new int[] { //CGA Colours
+	private int[] colours = new int[] { //CGA Colours
               0xFF000000,
               0xFF0000AA,
               0xFF00AA00,
@@ -41,9 +43,10 @@ public class Worker implements Runnable {
 			InputStream font_in = new FileInputStream("font.bin");
 			InputStream cols_in = new FileInputStream("cols.dat");
 			font = new boolean[256][64];
+			fcols = new ColC[136];
 			int temp = 0;
 			int mask = 0;
-			for (int cha = 0; cha < 256; cha++) {
+			for (int cha = 0; cha < 256; cha++) { //read font table
 				for (int row = 0; row < 8; row++) {
 					temp = font_in.read();
 					for (int col = 7; col >= 0; col--) {
@@ -52,6 +55,10 @@ public class Worker implements Runnable {
 						font[cha][(row*8) + col] = (mask != 0);
 					}
 				}
+			}
+			//read col table
+			for (int i=0; i<136; i++) {
+				fcols[i] = new ColC((byte)cols_in.read(), (byte)cols_in.read(), ColourUtil.makeCol(cols_in.read(), cols_in.read(), cols_in.read()));
 			}
 			
 		} catch (FileNotFoundException e) {
@@ -63,21 +70,29 @@ public class Worker implements Runnable {
 
 	@Override
 	public void run() {
+		working = true;
 		UCell cur;
 		Algorithim matcher;
 		while ((cur = input.poll()) != null) { //worker loop
 			if (getStdDev(cur.getData()) > threshold) {
-				matcher = new Slow();
+				matcher = new Slow(font);
 			}
 			else {
-				matcher = new Fast();
+				matcher = new Fast(fcols);
 			}
 			result.setCell(cur.getNum(), matcher.match(cur.getData()));
 		}
-		
+		working = false;
 	}
 	
+	public boolean isWorking() {
+		return working;
+	}
+	
+	
+	
 	private int getStdDev(int[] im) {
+		System.out.println(im);
 		long totR = 0;
 		long totG = 0;
 		long totB = 0;
@@ -87,7 +102,6 @@ public class Worker implements Runnable {
 		
 		for (int pix = 0; pix < 64; pix++) { //calculate totals and square sum
 			int col = im[pix];
-			
 			int r = ColourUtil.getR(col);
 			int g = ColourUtil.getG(col);
 			int b = ColourUtil.getB(col);
@@ -101,11 +115,11 @@ public class Worker implements Runnable {
 			sigmaB2 += (b * b);
 		}
 		//calculate square of the means (>>6 to divide by 64 fast)
-		float mRed = (totR * totR) >> 6;
-		float mGreen = (totG * totG) >> 6;
-		float mBlue = (totB * totB) >> 6;
-		
-		return (int)(Math.sqrt(sigmaR2 - mRed) + Math.sqrt(sigmaG2 - mGreen) + Math.sqrt(sigmaB2 - mBlue)) >> 3; 
+		double mRed = (totR * totR) >> 6;
+		double mGreen = (totG * totG) >> 6;
+		double mBlue = (totB * totB) >> 6;
+		int maybe = (int)(Math.sqrt(sigmaR2 - mRed) + Math.sqrt(sigmaG2 - mGreen) + Math.sqrt(sigmaB2 - mBlue));
+		return maybe;
 		//(>>3)8 is close enough to sqrt 63.
 	}
 }
