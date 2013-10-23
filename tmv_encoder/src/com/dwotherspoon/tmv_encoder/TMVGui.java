@@ -33,6 +33,7 @@ public class TMVGui {
 	private JMenuItem iabout;
 	private ImgPanel sframe;
 	private ImgPanel oframe;
+	private ImgPanel tframe;
 	private JProgressBar pbar;
 	private JTextPane console;
 	private JButton encbut;
@@ -79,6 +80,11 @@ public class TMVGui {
 		oframe.setLocation(380,20);
 		oframe.setSize(320,200);
 		
+		//DEBUG
+		tframe = new ImgPanel(8,8);
+		tframe.setSize(8,8);
+		tframe.setLocation(500, 590 );
+		
 		pbar = new JProgressBar();
 		pbar.setLocation(20, 240);
 		pbar.setSize(680, 25);
@@ -112,6 +118,7 @@ public class TMVGui {
 		window.add(pbar);
 		window.add(console);
 		window.add(encbut);
+		window.add(tframe);
 		window.setVisible(true);
 		
 	}
@@ -137,20 +144,23 @@ public class TMVGui {
 					e2.printStackTrace();
 				}
 			
-				
+				BufferedImage testing = new BufferedImage(8,8, BufferedImage.TYPE_3BYTE_BGR);
 				ConcurrentLinkedQueue<UCell> togo = new ConcurrentLinkedQueue<UCell>();
-				int[] buf = new int[64];
+				int[] buf;
 				for (int row = 0; row < 25; row++) { //split the image
 					for (int col = 0; col < 40; col++) {
+						buf = new int[64];
 						for (int y = 0; y < 8; y++) {
 							for (int x =0; x< 8; x++) {
 								buf[(y*8)+x] = (in.getRGB((col*8)+x, (row*8)+y) & 0x00FFFFFF); //AND removes alpha channel.
+								testing.setRGB(x, y, in.getRGB((col*8)+x, (row*8)+y));
 								//System.out.println((y*8)+x + " : " + buf[(y*8)+x]);
 							}
 						}
 						togo.add(new UCell(buf, (row*40)+col ));
 					}
 				}
+				tframe.setImage(testing);
 				TMVFrame back = new TMVFrame();
 				InputStream font_in;
 				boolean[][] font = new boolean[256][64];

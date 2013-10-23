@@ -14,7 +14,7 @@ import java.io.InputStream;
 public class Worker implements Runnable {
 	private ConcurrentLinkedQueue<UCell> input;
 	private TMVFrame result;
-	private int threshold = 60;
+	private int threshold = Integer.MAX_VALUE;
 	private boolean[][] font;
 	private ColC[] fcols;
 	private boolean working = false;;
@@ -92,7 +92,6 @@ public class Worker implements Runnable {
 	
 	
 	private int getStdDev(int[] im) {
-		System.out.println(im);
 		long totR = 0;
 		long totG = 0;
 		long totB = 0;
@@ -118,8 +117,7 @@ public class Worker implements Runnable {
 		double mRed = (totR * totR) >> 6;
 		double mGreen = (totG * totG) >> 6;
 		double mBlue = (totB * totB) >> 6;
-		int maybe = (int)(Math.sqrt(sigmaR2 - mRed) + Math.sqrt(sigmaG2 - mGreen) + Math.sqrt(sigmaB2 - mBlue));
-		return maybe;
+		return (int)(Math.sqrt(sigmaR2 - mRed) + Math.sqrt(sigmaG2 - mGreen) + Math.sqrt(sigmaB2 - mBlue)) >> 3;
 		//(>>3)8 is close enough to sqrt 63.
 	}
 }

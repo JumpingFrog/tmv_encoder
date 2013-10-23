@@ -17,7 +17,7 @@ public final class ColC {
 	}
 	
 	public byte getCol1() {
-		return col2;
+		return col1;
 	}
 	
 	public byte getCol2() {
