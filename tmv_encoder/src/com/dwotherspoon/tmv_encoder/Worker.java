@@ -14,7 +14,7 @@ import java.io.InputStream;
 public class Worker implements Runnable {
 	private ConcurrentLinkedQueue<UCell> input;
 	private TMVFrame result;
-	private int threshold = Integer.MAX_VALUE;
+	private int threshold = 60; //allow this to be set
 	private boolean[][] font;
 	private ColC[] fcols;
 	private boolean working = false;;

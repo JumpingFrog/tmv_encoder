@@ -4,7 +4,7 @@ import com.dwotherspoon.tmv_encoder.Cell;
 import com.dwotherspoon.tmv_encoder.ColC;
 import com.dwotherspoon.tmv_encoder.ColourUtil;
 
-public class Fast implements Algorithim{
+public final class Fast implements Algorithim{
 	private ColC[] fcols;
 	
 	public Fast(ColC[] cols) {
@@ -31,7 +31,7 @@ public class Fast implements Algorithim{
 		return result;
 	}
 	
-	private int getAvgCol(int[] img) { //returns array to minimise post processing
+	private int getAvgCol(int[] img) {
 		int totR = 0;
 		int totG = 0;
 		int totB = 0;

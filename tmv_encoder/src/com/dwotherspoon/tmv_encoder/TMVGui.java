@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /* The GUI for TMV Encoder */
 
-public class TMVGui {
+public final class TMVGui {
 	private JFrame window;
 	private JMenuBar mbar;
 	private JMenuItem iopen;

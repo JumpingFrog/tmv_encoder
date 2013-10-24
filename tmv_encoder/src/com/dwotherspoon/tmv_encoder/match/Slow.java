@@ -3,7 +3,7 @@ package com.dwotherspoon.tmv_encoder.match;
 import com.dwotherspoon.tmv_encoder.Cell;
 import com.dwotherspoon.tmv_encoder.ColourUtil;
 
-public class Slow implements Algorithim {
+public final class Slow implements Algorithim {
 	private boolean[][] font;
 	
 	private int[] colours = new int[] { //CGA Colours
@@ -31,8 +31,50 @@ public class Slow implements Algorithim {
 
 	@Override
 	public Cell match(int[] image) {
-		// TODO Auto-generated method stub
-		return null;
+		Cell result = new Cell();
+		int diff1 = 0;
+		int diff2 = 0;
+		int min = Integer.MAX_VALUE;
+		int cur;
+		byte[] m = getMCommon(image);
+				
+		for (int cha = 3; cha < 255; cha++) {
+			diff1 = 0;
+			diff2 = 0;
+			System.out.println("---------------------------------");
+			for (int pix = 0; pix < 64; pix++) {
+				cur = image[pix];
+				if (font[cha][pix]) {
+					diff1 += ColourUtil.diffCol(cur, m[0]);
+					diff2 += ColourUtil.diffCol(cur, m[1]);
+				}
+				else {
+					diff1 += ColourUtil.diffCol(cur, m[1]);
+					diff2 += ColourUtil.diffCol(cur, m[0]);
+				}
+			}
+			System.out.println("Cha: " + cha);
+			System.out.println("Diff1: " + diff1);
+			System.out.println("Diff2: " + diff2);
+			if (diff1 < min) {
+				min = diff1;
+				result.setCha(cha);
+				result.setBackground(m[0]);
+				result.setForeground(m[1]);
+			}
+			
+			if (diff2 < min) {
+				min = diff2;
+				result.setCha(cha);
+				result.setBackground(m[1]);
+				result.setForeground(m[0]);
+			}
+		}
+		
+		//result.setCha(0);
+		result.setBackground(m[0]);
+		System.out.println("Best Cha: " + result.getCha());
+		return result;
 	}
 	
 	private byte[] getMCommon(int[] image) {
@@ -68,7 +110,7 @@ public class Slow implements Algorithim {
 			counts[8] = (byte) (counts[8] * 0.3);
 			counts[7] = (byte) (counts[7] * 0.6);
 		} else if (ret[0] == 8) {
-			counts[0] = (byte) (counts[8] * 0.6);
+			counts[0] = (byte) (counts[0] * 0.6);
 			counts[7] = (byte) (counts[7] * 0.6);
 		}
 		counts[ret[0]] = 0; //zero out first highest.
