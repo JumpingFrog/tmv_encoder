@@ -20,6 +20,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JButton;
 import javax.swing.JTextPane;
 import javax.swing.border.LineBorder;
+import javax.swing.JLabel;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -33,10 +34,11 @@ public final class TMVGui {
 	private JMenuItem iabout;
 	private ImgPanel sframe;
 	private ImgPanel oframe;
-	private ImgPanel tframe;
 	private JProgressBar pbar;
 	private JTextPane console;
 	private JButton encbut;
+	private JLabel srcf;
+	private JLabel outf;
 	
 	public TMVGui() { //build the gui
 		window = new JFrame("TMV Encoder");
@@ -73,17 +75,20 @@ public final class TMVGui {
 		mbar.add(iabout);
 		
 		sframe = new ImgPanel(320,200);
-		sframe.setLocation(20,20);
+		sframe.setLocation(20,25);
 		sframe.setSize(320,200);
 		
-		oframe = new ImgPanel(320,200);
-		oframe.setLocation(380,20);
-		oframe.setSize(320,200);
+		srcf = new JLabel("Source frame:");
+		srcf.setLocation(20, 10);
+		srcf.setSize(100, 15);
 		
-		//DEBUG
-		tframe = new ImgPanel(8,8);
-		tframe.setSize(8,8);
-		tframe.setLocation(500, 590 );
+		outf = new JLabel("Output frame:");
+		outf.setLocation(380, 10);
+		outf.setSize(100, 15);
+		
+		oframe = new ImgPanel(320,200);
+		oframe.setLocation(380,25);
+		oframe.setSize(320,200);
 		
 		pbar = new JProgressBar();
 		pbar.setLocation(20, 240);
@@ -113,54 +118,22 @@ public final class TMVGui {
 		});
 		
 		window.setJMenuBar(mbar);
+		window.add(srcf);
+		window.add(outf);
 		window.add(sframe);
 		window.add(oframe);
 		window.add(pbar);
 		window.add(console);
 		window.add(encbut);
-		window.add(tframe);
 		window.setVisible(true);
-		
 	}
 	
 	private void open() {
 		JFileChooser chooser = new JFileChooser();
 		if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 			writeConsole("Attempting to open: " + chooser.getSelectedFile().getName());
-			//Decode video = new Decode(chooser.getSelectedFile().getAbsolutePath());
-			encbut.setEnabled(true);
-			//XuggleFrame f = video.getFrame();
-			BufferedImage in = new BufferedImage(320,200, BufferedImage.TYPE_3BYTE_BGR);
-			Graphics g = in.getGraphics();
-				BufferedImage tempi;
-				try {
-					tempi = ImageIO.read(chooser.getSelectedFile());
+			encbut.setEnabled(true);	
 
-					g.drawImage(tempi, 0,0,320,200,null);
-					g.dispose();
-					sframe.setImage(in); //hacked together for testing
-				} catch (IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
-			
-				BufferedImage testing = new BufferedImage(8,8, BufferedImage.TYPE_3BYTE_BGR);
-				ConcurrentLinkedQueue<UCell> togo = new ConcurrentLinkedQueue<UCell>();
-				int[] buf;
-				for (int row = 0; row < 25; row++) { //split the image
-					for (int col = 0; col < 40; col++) {
-						buf = new int[64];
-						for (int y = 0; y < 8; y++) {
-							for (int x =0; x< 8; x++) {
-								buf[(y*8)+x] = (in.getRGB((col*8)+x, (row*8)+y) & 0x00FFFFFF); //AND removes alpha channel.
-								testing.setRGB(x, y, in.getRGB((col*8)+x, (row*8)+y));
-								//System.out.println((y*8)+x + " : " + buf[(y*8)+x]);
-							}
-						}
-						togo.add(new UCell(buf, (row*40)+col ));
-					}
-				}
-				tframe.setImage(testing);
 				TMVFrame back = new TMVFrame();
 				InputStream font_in;
 				boolean[][] font = new boolean[256][64];
@@ -184,15 +157,6 @@ public final class TMVGui {
 				}
 				
 				
-				try {
-					Thread test = new Thread(new Worker(togo, back));
-					test.run();
-					while (test.isAlive()) {
-					}
-					oframe.setImage(back.render(font));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 	

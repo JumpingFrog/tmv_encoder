@@ -38,7 +38,7 @@ public class Worker implements Runnable {
               0xFFFFFFFF
       };
 	
-	public Worker(ConcurrentLinkedQueue<UCell> cells, TMVFrame res) throws IOException {
+	public Worker() throws IOException {
 		try { //try and load font and colour tables in
 			InputStream font_in = new FileInputStream("font.bin");
 			InputStream cols_in = new FileInputStream("cols.dat");
@@ -60,12 +60,16 @@ public class Worker implements Runnable {
 			for (int i=0; i<136; i++) {
 				fcols[i] = new ColC((byte)cols_in.read(), (byte)cols_in.read(), ColourUtil.makeCol(cols_in.read(), cols_in.read(), cols_in.read()));
 			}
-			
+			font_in.close();
+			cols_in.close();
 		} catch (FileNotFoundException e) {
 			throw new FileNotFoundException("Required files not found.");
 		}
-		input = cells;
+	}
+	
+	public void setup(ConcurrentLinkedQueue<UCell> cells, TMVFrame res) { //set this before run!
 		result = res;
+		input = cells;
 	}
 
 	@Override

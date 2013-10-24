@@ -109,7 +109,7 @@ public class Decode {
 					while (offset < pkt.getSize()) {
 						offset += audStream.decodeAudio(samples, pkt, offset);
 						if (samples.isComplete()) {
-							return new XuggleAFrame(samples.getTimeStamp());
+							return new XuggleAFrame(samples.getTimeStamp(), samples);
 						}
 					}
 				}

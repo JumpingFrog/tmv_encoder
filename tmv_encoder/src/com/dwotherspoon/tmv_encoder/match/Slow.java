@@ -41,39 +41,31 @@ public final class Slow implements Algorithim {
 		for (int cha = 3; cha < 255; cha++) {
 			diff1 = 0;
 			diff2 = 0;
-			System.out.println("---------------------------------");
 			for (int pix = 0; pix < 64; pix++) {
 				cur = image[pix];
 				if (font[cha][pix]) {
-					diff1 += ColourUtil.diffCol(cur, m[0]);
-					diff2 += ColourUtil.diffCol(cur, m[1]);
+					diff1 += ColourUtil.diffCol(cur, colours[m[0]]);
+					diff2 += ColourUtil.diffCol(cur, colours[m[1]]);
 				}
 				else {
-					diff1 += ColourUtil.diffCol(cur, m[1]);
-					diff2 += ColourUtil.diffCol(cur, m[0]);
+					diff1 += ColourUtil.diffCol(cur, colours[m[1]]);
+					diff2 += ColourUtil.diffCol(cur, colours[m[0]]);
 				}
 			}
-			System.out.println("Cha: " + cha);
-			System.out.println("Diff1: " + diff1);
-			System.out.println("Diff2: " + diff2);
 			if (diff1 < min) {
 				min = diff1;
 				result.setCha(cha);
-				result.setBackground(m[0]);
-				result.setForeground(m[1]);
+				result.setBackground(m[1]);
+				result.setForeground(m[0]);
 			}
 			
 			if (diff2 < min) {
 				min = diff2;
 				result.setCha(cha);
-				result.setBackground(m[1]);
-				result.setForeground(m[0]);
+				result.setBackground(m[0]);
+				result.setForeground(m[1]);
 			}
 		}
-		
-		//result.setCha(0);
-		result.setBackground(m[0]);
-		System.out.println("Best Cha: " + result.getCha());
 		return result;
 	}
 	

@@ -12,8 +12,13 @@ public class Main {
 			System.out.println("TMV Encoder started, to run as gui please relaunch without arugments.");
 		}
 		else { //load the gui
+			System.out.println("TMV Encoder started as swing application. Drawing gui..");
 			new TMVGui();
 		}
+	}
+	
+	public static void encode() {
+		
 	}
 
 }
