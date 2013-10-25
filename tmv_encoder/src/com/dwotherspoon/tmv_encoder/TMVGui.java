@@ -39,6 +39,7 @@ public final class TMVGui {
 	private JButton encbut;
 	private JLabel srcf;
 	private JLabel outf;
+	private String fpath;
 	
 	public TMVGui() { //build the gui
 		window = new JFrame("TMV Encoder");
@@ -111,8 +112,7 @@ public final class TMVGui {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				
+				encode();
 			}
 			
 		});
@@ -133,32 +133,23 @@ public final class TMVGui {
 		if (chooser.showOpenDialog(window) == JFileChooser.APPROVE_OPTION) {
 			writeConsole("Attempting to open: " + chooser.getSelectedFile().getName());
 			encbut.setEnabled(true);	
-
-				TMVFrame back = new TMVFrame();
-				InputStream font_in;
-				boolean[][] font = new boolean[256][64];
-				try {
-					font_in = new FileInputStream("font.bin");
-					int temp = 0;
-					int mask = 0;
-					for (int cha = 0; cha < 256; cha++) { //read font table
-						for (int row = 0; row < 8; row++) {
-							temp = font_in.read();
-							for (int col = 7; col >= 0; col--) {
-								mask = (128 >> col); //bit mask reverses endian
-								mask &= temp;
-								font[cha][(row*8) + col] = (mask != 0);
-							}
-						}
-					}
-				} catch (Exception e1)  {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-				
+			fpath = chooser.getSelectedFile().getAbsolutePath();
 			}
 		}
+	public void encode() {
+		TMVEncode enc = new TMVEncode(fpath, this);
+		Thread starter = new Thread(enc);
+		starter.start();
+		writeConsole("Starting encode thread...");
+	}
+	
+	public void updateSframe(BufferedImage in) {
+		sframe.setImage(in);
+	}
+	
+	public void updateOframe(BufferedImage in) {
+		oframe.setImage(in);
+	}
 	
 	public void writeConsole(String text) {
 		console.setText(console.getText() + '\n' + text);

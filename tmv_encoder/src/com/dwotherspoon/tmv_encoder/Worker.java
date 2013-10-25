@@ -17,7 +17,6 @@ public class Worker implements Runnable {
 	private int threshold = 60; //allow this to be set
 	private boolean[][] font;
 	private ColC[] fcols;
-	private boolean working = false;;
 	
 	private int[] colours = new int[] { //CGA Colours
               0xFF000000,
@@ -74,7 +73,6 @@ public class Worker implements Runnable {
 
 	@Override
 	public void run() {
-		working = true;
 		UCell cur;
 		Algorithim matcher;
 		while ((cur = input.poll()) != null) { //worker loop
@@ -86,11 +84,6 @@ public class Worker implements Runnable {
 			}
 			result.setCell(cur.getNum(), matcher.match(cur.getData()));
 		}
-		working = false;
-	}
-	
-	public boolean isWorking() {
-		return working;
 	}
 	
 	
