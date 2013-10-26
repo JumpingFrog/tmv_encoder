@@ -2,7 +2,7 @@ package com.dwotherspoon.tmv_encoder;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import com.dwotherspoon.tmv_encoder.match.Algorithim;
+import com.dwotherspoon.tmv_encoder.match.Algorithm;
 import com.dwotherspoon.tmv_encoder.match.Fast;
 import com.dwotherspoon.tmv_encoder.match.Slow;
 
@@ -74,7 +74,7 @@ public class Worker implements Runnable {
 	@Override
 	public void run() {
 		UCell cur;
-		Algorithim matcher;
+		Algorithm matcher;
 		while ((cur = input.poll()) != null) { //worker loop
 			if (getStdDev(cur.getData()) > threshold) {
 				matcher = new Slow(font);

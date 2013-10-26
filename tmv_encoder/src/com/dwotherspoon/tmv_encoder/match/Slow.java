@@ -3,7 +3,7 @@ package com.dwotherspoon.tmv_encoder.match;
 import com.dwotherspoon.tmv_encoder.Cell;
 import com.dwotherspoon.tmv_encoder.ColourUtil;
 
-public final class Slow implements Algorithim {
+public final class Slow implements Algorithm {
 	private boolean[][] font;
 	
 	private int[] colours = new int[] { //CGA Colours

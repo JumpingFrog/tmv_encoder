@@ -4,7 +4,7 @@ import com.dwotherspoon.tmv_encoder.Cell;
 import com.dwotherspoon.tmv_encoder.ColC;
 import com.dwotherspoon.tmv_encoder.ColourUtil;
 
-public final class Fast implements Algorithim{
+public final class Fast implements Algorithm{
 	private ColC[] fcols;
 	
 	public Fast(ColC[] cols) {

@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public final class TMVEncode implements Runnable {
 	private String input;
 	private BufferedImage cur_frame;
+	private BufferedImage out_frame;
 	private TMVFrame cur_enc;
 	private ConcurrentLinkedQueue<UCell> pool;
 	private ConcurrentLinkedQueue<TMVFrame> output;
@@ -44,9 +45,6 @@ public final class TMVEncode implements Runnable {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-		
-		
 	}
 	
 	
@@ -78,16 +76,27 @@ public final class TMVEncode implements Runnable {
 					workers[i].setup(pool, cur_enc);
 					threads[i].start();
 				}
+				
 				wflag = true;
+				/*
 				while (wflag == true) {
 					for (int i = 0; i < workers.length; i++) {
 						if (!threads[i].isAlive()) {
 							wflag = false;
 						}
 					}
+				}*/
+				for (int i = 0; i<workers.length; i++) { //setup workers for new frame + start
+					try {
+						threads[i].join();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-				gui.updateOframe(cur_enc.render(font));
 				output.add(cur_enc);
+				out_frame = cur_enc.render(font);
+				gui.updateOframe(out_frame); 
 
 				//System.out.println(output.size());
 			}

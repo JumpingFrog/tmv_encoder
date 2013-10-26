@@ -4,8 +4,10 @@ import java.awt.image.BufferedImage;
 
 /* A data structure for TMV video frames */
 
+
 public class TMVFrame {
 	private Cell[] cells;
+	private BufferedImage res;
 	
 	private int[] colours = new int[] { //CGA Colours
               0xFF000000,
@@ -45,7 +47,7 @@ public class TMVFrame {
 	}
 	
 	public BufferedImage render(boolean[][] font) {
-		BufferedImage res = new BufferedImage(320, 200, BufferedImage.TYPE_3BYTE_BGR);
+		res = new BufferedImage(320, 200, BufferedImage.TYPE_3BYTE_BGR);
 		for (int row = 0; row < 25; row++) {
 			for (int col = 0; col < 40; col++) {
 				for (int y = 0; y < 8; y++) {

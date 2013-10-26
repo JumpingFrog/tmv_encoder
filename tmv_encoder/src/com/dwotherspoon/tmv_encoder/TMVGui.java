@@ -138,7 +138,7 @@ public final class TMVGui {
 		}
 	public void encode() {
 		TMVEncode enc = new TMVEncode(fpath, this);
-		Thread starter = new Thread(enc);
+		Thread starter = new Thread(enc, "Encode Thread");
 		starter.start();
 		writeConsole("Starting encode thread...");
 	}
