@@ -9,5 +9,9 @@ public final class XuggleAFrame extends XuggleFrame {
 		super(ts);
 		samples = s;
 	}
+	
+	public IAudioSamples getSamples() {
+		return samples;
+	}
 
 }

@@ -1,10 +1,14 @@
 package com.dwotherspoon.tmv_encoder;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import com.xuggle.xuggler.IAudioSamples;
 
 
 /* Main encoder thread. */
@@ -13,6 +17,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public final class TMVEncode implements Runnable {
 	private String input;
 	private BufferedImage cur_frame;
+	private IAudioSamples cur_samples;
+	private ByteArrayOutputStream audio_out;
 	private BufferedImage out_frame;
 	private TMVFrame cur_enc;
 	private ConcurrentLinkedQueue<UCell> pool;
@@ -23,6 +29,7 @@ public final class TMVEncode implements Runnable {
 	public TMVEncode(String input, TMVGui src) {
 		this.input = input;
 		output = new ConcurrentLinkedQueue<TMVFrame>();
+		audio_out = new ByteArrayOutputStream();
 		gui = src;
 		
 		InputStream font_in;
@@ -53,7 +60,7 @@ public final class TMVEncode implements Runnable {
 		XuggleFrame cur;
 		Thread[] threads = new Thread[Runtime.getRuntime().availableProcessors()];
 		Worker[] workers = new Worker[threads.length];
-		
+		int srate = video.getSampleRate();
 		
 		for (int  i = 0; i<workers.length; i++) {
 			try {
@@ -64,29 +71,19 @@ public final class TMVEncode implements Runnable {
 				e.printStackTrace();
 			}
 		}
-		boolean wflag;
 		while ((cur = video.getFrame()) != null) {
 			if (cur instanceof XuggleVFrame) {
 				cur_frame = ((XuggleVFrame) cur).getImage(); //n.b. critical section
 				gui.updateSframe(cur_frame);
 				cur_enc = new TMVFrame();
 				split();
+				
 				for (int i = 0; i<workers.length; i++) { //setup workers for new frame + start
 					threads[i] = new Thread(workers[i]);
 					workers[i].setup(pool, cur_enc);
 					threads[i].start();
 				}
-				
-				wflag = true;
-				/*
-				while (wflag == true) {
-					for (int i = 0; i < workers.length; i++) {
-						if (!threads[i].isAlive()) {
-							wflag = false;
-						}
-					}
-				}*/
-				for (int i = 0; i<workers.length; i++) { //setup workers for new frame + start
+				for (int i = 0; i<workers.length; i++) { //wait for workers to finish
 					try {
 						threads[i].join();
 					} catch (InterruptedException e) {
@@ -94,16 +91,34 @@ public final class TMVEncode implements Runnable {
 						e.printStackTrace();
 					}
 				}
+				
 				output.add(cur_enc);
 				out_frame = cur_enc.render(font);
 				gui.updateOframe(out_frame); 
-
-				//System.out.println(output.size());
 			}
 			else { //TODO do something with audio
-				
+				cur_samples = ((XuggleAFrame) cur).getSamples();
+				if (srate == 44100) {
+					for (long i = 0; i < cur_samples.getNumSamples(); i+= 2) { //every other sample (halve the samplesrate)
+						audio_out.write((byte)((cur_samples.getSample(i, 0, IAudioSamples.Format.FMT_S16) + 0x8000)>>8)); //TODO Stereo
+					}
+				}
+				else { //assume 22050Hz, no downsampling
+					for (long i = 0; i < cur_samples.getNumSamples(); i++) { //N.B. Xuggler current supports Signed 16bit audio ONLY. We need U8 N.B.
+						audio_out.write((byte)((cur_samples.getSample(i, 0, IAudioSamples.Format.FMT_S16) + 0x8000)>>8)); //TODO Stereo
+						//N.B. We need to decrease the sample rate to 22050Hz
+					}
+				}
 			}
 		}
+		Encode enc = new Encode(output, audio_out);
+		File tmvout = new File("//home//david//output.tmv");
+		
+		srate = (srate == 44100) ? 22050 : srate;
+		
+		double chunksize = srate/video.getFrameRate();
+		enc.saveTMV(tmvout, srate, (int)chunksize);
+		
 		System.out.println("FINISH!");
 	}
 	
