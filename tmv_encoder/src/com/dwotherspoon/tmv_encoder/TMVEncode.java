@@ -61,6 +61,8 @@ public final class TMVEncode implements Runnable {
 		Thread[] threads = new Thread[Runtime.getRuntime().availableProcessors()];
 		Worker[] workers = new Worker[threads.length];
 		int srate = video.getSampleRate();
+		int fcount = 0; //local frame number (because O(n) traversal is slow).
+		double divisor = (double)video.getDuration()/100000000; //for progress bar
 		
 		for (int  i = 0; i<workers.length; i++) {
 			try {
@@ -94,7 +96,8 @@ public final class TMVEncode implements Runnable {
 				
 				output.add(cur_enc);
 				out_frame = cur_enc.render(font);
-				gui.updateOframe(out_frame); 
+				gui.updateOframe(out_frame);
+				gui.setBar((int)Math.round((fcount++/video.getFrameRate())/divisor));
 			}
 			else { //TODO do something with audio
 				cur_samples = ((XuggleAFrame) cur).getSamples();

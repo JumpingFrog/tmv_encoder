@@ -51,6 +51,7 @@ public class Decode {
 		
 		converter = ConverterFactory.createConverter("XUGGLER-BGR-24", vidStream.getPixelType(), vidStream.getWidth(), vidStream.getHeight());
 		//TODO allow video or audio only mode
+		System.out.println("Duration: " + file.getDuration());
 		pkt = IPacket.make();
 		offset = pkt.getSize();
 	}
@@ -133,6 +134,10 @@ public class Decode {
 	
 	public IStreamCoder getVideo() {
 		return vidStream;
+	}
+	
+	public long getDuration() {
+		return file.getDuration();
 	}
 	
 	public void dispose() {

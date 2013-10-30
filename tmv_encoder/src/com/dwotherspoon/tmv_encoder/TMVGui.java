@@ -95,6 +95,8 @@ public final class TMVGui {
 		pbar.setLocation(20, 240);
 		pbar.setSize(680, 25);
 		pbar.setStringPainted(true);
+		pbar.setMaximum(100);
+		pbar.setMinimum(0);
 		
 		console = new JTextPane();
 		console.setBorder(new LineBorder(Color.gray, 2));
@@ -141,6 +143,7 @@ public final class TMVGui {
 		Thread starter = new Thread(enc, "Encode Thread");
 		starter.start();
 		writeConsole("Starting encode thread...");
+		encbut.setEnabled(false);
 	}
 	
 	public void updateSframe(BufferedImage in) {
@@ -151,7 +154,16 @@ public final class TMVGui {
 		oframe.setImage(in);
 	}
 	
+	public void setBar(int percent) {
+		pbar.setValue(percent);
+	}
+	
 	public void writeConsole(String text) {
 		console.setText(console.getText() + '\n' + text);
+	}
+	
+	public void convFinish() {
+		encbut.setEnabled(true);
+		writeConsole("Conversion finished, file saved as output.tmv");
 	}
 }
