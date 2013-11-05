@@ -12,12 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JProgressBar;
 import javax.swing.JButton;
+import javax.swing.JRadioButton;
 import javax.swing.JTextPane;
 import javax.swing.border.LineBorder;
 import javax.swing.JLabel;
@@ -27,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 /* The GUI for TMV Encoder */
 
-public final class TMVGui {
+public final class TMVGui { //prefix things
 	private JFrame window;
 	private JMenuBar mbar;
 	private JMenuItem iopen;
@@ -39,6 +41,10 @@ public final class TMVGui {
 	private JButton encbut;
 	private JLabel srcf;
 	private JLabel outf;
+	private JLabel lbl_cspace;
+	private JRadioButton rb_yuv;
+	private JRadioButton rb_rgb;
+	private ButtonGroup bg_cspace;
 	private String fpath;
 	
 	public TMVGui() { //build the gui
@@ -66,7 +72,7 @@ public final class TMVGui {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				About abox = new About();
 				
 			}
 			
@@ -119,6 +125,23 @@ public final class TMVGui {
 			
 		});
 		
+		lbl_cspace = new JLabel("Colour space:");
+		lbl_cspace.setLocation(400,590);
+		lbl_cspace.setSize(100,15);
+		
+		bg_cspace = new ButtonGroup();
+		
+		rb_yuv = new JRadioButton("YUV");
+		rb_yuv.setLocation(400,610);
+		rb_yuv.setSize(60,15);
+		
+		rb_rgb = new JRadioButton("RGB");
+		rb_rgb.setLocation(460, 610);
+		rb_rgb.setSize(60,15);
+		
+		bg_cspace.add(rb_rgb);
+		bg_cspace.add(rb_yuv);
+		
 		window.setJMenuBar(mbar);
 		window.add(srcf);
 		window.add(outf);
@@ -127,6 +150,9 @@ public final class TMVGui {
 		window.add(pbar);
 		window.add(console);
 		window.add(encbut);
+		window.add(lbl_cspace);
+		window.add(rb_yuv);
+		window.add(rb_rgb);
 		window.setVisible(true);
 	}
 	
@@ -139,7 +165,7 @@ public final class TMVGui {
 			}
 		}
 	public void encode() {
-		TMVEncode enc = new TMVEncode(fpath, this);
+		TMVEncode enc = new TMVEncode(fpath, this, false);
 		Thread starter = new Thread(enc, "Encode Thread");
 		starter.start();
 		writeConsole("Starting encode thread...");

@@ -27,6 +27,7 @@ public class Decode {
 	private int offset;
 	private IVideoPicture picture;
 	private IAudioSamples samples;
+	private String colourspace;
 	
 	public Decode(String in) {
 		file = IContainer.make();
@@ -48,12 +49,12 @@ public class Decode {
 			coder.open(null, null);
 		}
 		audStream.getSampleRate();
-		
 		converter = ConverterFactory.createConverter("XUGGLER-BGR-24", vidStream.getPixelType(), vidStream.getWidth(), vidStream.getHeight());
 		//TODO allow video or audio only mode
 		System.out.println("Duration: " + file.getDuration());
 		pkt = IPacket.make();
 		offset = pkt.getSize();
+		this.colourspace = colourspace;
 	}
 	
 	   public XuggleVFrame readFrame() {
@@ -90,13 +91,15 @@ public class Decode {
 	
 	public XuggleFrame getFrame() { //https://github.com/artclarke/xuggle-xuggler/blob/master/src/com/xuggle/xuggler/demos/DecodeAndPlayAudioAndVideo.java
 		int val = 0;
+
+		cur_frame = new BufferedImage(320, 200, BufferedImage.TYPE_3BYTE_BGR);
 		while (val >= 0) {
 				if (pkt.getStreamIndex() == vidID) { //is packet a video?
 					picture = IVideoPicture.make(vidStream.getPixelType(), vidStream.getWidth(), vidStream.getHeight());
 					 while (offset < pkt.getSize()) { //loop until we've got the whole packet read
 						 offset += vidStream.decodeVideo(picture, pkt, offset);
 						 if (picture.isComplete()) { //complete frame get - resize and return.
-							 cur_frame = new BufferedImage(320, 200, BufferedImage.TYPE_3BYTE_BGR);
+							 
 							 Graphics g = cur_frame.getGraphics();
 							 g.drawImage(converter.toImage(picture), 0, 0, 320, 200, null);
 							 g.dispose();

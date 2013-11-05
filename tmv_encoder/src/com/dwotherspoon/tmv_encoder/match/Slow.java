@@ -5,8 +5,9 @@ import com.dwotherspoon.tmv_encoder.ColourUtil;
 
 public final class Slow implements Algorithm {
 	private boolean[][] font;
+	private boolean yuv;
 	
-	private int[] colours = new int[] { //CGA Colours
+	private int[] cgaRGB = new int[] { //CGA Colours
             0xFF000000,
             0xFF0000AA,
             0xFF00AA00,
@@ -25,8 +26,30 @@ public final class Slow implements Algorithm {
             0xFFFFFFFF
     };
 	
-	public Slow(boolean[][] f) {
+	private int[] cgaYUV = new int[] { //n.b. ayuv
+			0xFF008080,
+			0xFF13d572,
+			0xFF634738,
+			0xFF779c2b,
+			0xFF3263d5,
+			0xFF46b8c7,
+			0xFF6447b1,
+			0xFFaa8080,
+			0xFF558080,
+			0xFF68d572,
+			0xFFb84738,
+			0xFFcc9c2b,
+			0xFF8763d5,
+			0xFF9bb8c7,
+			0xFFeb2b8d,
+			0xFFff8080
+	};
+	private int[] colours;
+	
+	public Slow(boolean[][] f, boolean yuv) {
 		font = f;
+		colours = yuv ? cgaYUV : cgaRGB;
+		this.yuv = yuv;
 	}
 
 	@Override
@@ -44,12 +67,12 @@ public final class Slow implements Algorithm {
 			for (int pix = 0; pix < 64; pix++) {
 				cur = image[pix];
 				if (font[cha][pix]) {
-					diff1 += ColourUtil.diffCol(cur, colours[m[0]]);
-					diff2 += ColourUtil.diffCol(cur, colours[m[1]]);
+					diff1 += ColourUtil.diffCol(cur, colours[m[0]], yuv);
+					diff2 += ColourUtil.diffCol(cur, colours[m[1]], yuv);
 				}
 				else {
-					diff1 += ColourUtil.diffCol(cur, colours[m[1]]);
-					diff2 += ColourUtil.diffCol(cur, colours[m[0]]);
+					diff1 += ColourUtil.diffCol(cur, colours[m[1]], yuv);
+					diff2 += ColourUtil.diffCol(cur, colours[m[0]], yuv);
 				}
 			}
 			if (diff1 < min) {
@@ -81,7 +104,7 @@ public final class Slow implements Algorithm {
 			minval = Integer.MAX_VALUE;
 			min = 0;
 			for (int colour = 0; colour<16; colour++) {
-				diff = ColourUtil.diffCol(cur, colours[colour]);
+				diff = ColourUtil.diffCol(cur, colours[colour], yuv);
 				if (diff < minval) {
 					min = colour;
 					minval = diff;

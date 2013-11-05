@@ -9,7 +9,7 @@ public class TMVFrame {
 	private Cell[] cells;
 	private BufferedImage res;
 	
-	private int[] colours = new int[] { //CGA Colours
+	private int[] colours = new int[] { //CGA Colours RGB
               0xFF000000,
               0xFF0000AA,
               0xFF00AA00,

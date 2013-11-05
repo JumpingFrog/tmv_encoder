@@ -1,4 +1,5 @@
 package com.dwotherspoon.tmv_encoder;
+
  /* An unprocessed cell */
 public class UCell {
 	private int[] img; //the image data

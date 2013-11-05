@@ -6,9 +6,11 @@ import com.dwotherspoon.tmv_encoder.ColourUtil;
 
 public final class Fast implements Algorithm{
 	private ColC[] fcols;
+	private boolean yuv;
 	
-	public Fast(ColC[] cols) {
+	public Fast(ColC[] cols, boolean yuv) {
 		fcols = cols;
+		this.yuv = yuv;
 	}
 	
 	@Override
@@ -21,7 +23,7 @@ public final class Fast implements Algorithm{
 		int temp;
 		
 		for (int i = 0; i < 136; i++) {
-			temp = ColourUtil.diffCol(avg, fcols[i].getAvg());
+			temp = ColourUtil.diffCol(avg, fcols[i].getAvg(), yuv);
 			if (temp < min) {
 				min = temp;
 				result.setBackground(fcols[i].getCol1());
@@ -31,7 +33,7 @@ public final class Fast implements Algorithm{
 		return result;
 	}
 	
-	private int getAvgCol(int[] img) {
+	private int getAvgCol(int[] img) { //same for YUV as RGB blending
 		int totR = 0;
 		int totG = 0;
 		int totB = 0;

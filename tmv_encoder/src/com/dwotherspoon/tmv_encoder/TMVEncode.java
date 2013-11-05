@@ -7,7 +7,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 import com.xuggle.xuggler.IAudioSamples;
 
 
@@ -25,13 +24,14 @@ public final class TMVEncode implements Runnable {
 	private ConcurrentLinkedQueue<TMVFrame> output;
 	private TMVGui gui;
 	private boolean[][] font;
+	private boolean yuv;
 	
-	public TMVEncode(String input, TMVGui src) {
+	public TMVEncode(String input, TMVGui src, boolean yuv) {
 		this.input = input;
 		output = new ConcurrentLinkedQueue<TMVFrame>();
 		audio_out = new ByteArrayOutputStream();
 		gui = src;
-		
+		this.yuv = yuv;
 		InputStream font_in;
 		font = new boolean[256][64];
 		try {
@@ -66,7 +66,7 @@ public final class TMVEncode implements Runnable {
 		
 		for (int  i = 0; i<workers.length; i++) {
 			try {
-				workers[i] = new Worker();
+				workers[i] = new Worker(yuv);
 				threads[i] = new Thread(workers[i]); //create workers (causes fonts and colour tables to be created)
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -107,7 +107,7 @@ public final class TMVEncode implements Runnable {
 					}
 				}
 				else { //assume 22050Hz, no downsampling
-					for (long i = 0; i < cur_samples.getNumSamples(); i++) { //N.B. Xuggler current supports Signed 16bit audio ONLY. We need U8 N.B.
+					for (long i = 0; i < cur_samples.getNumSamples(); i++) { //N.B. Xuggler current supports Signed 16bit audio ONLY. We need U8
 						audio_out.write((byte)((cur_samples.getSample(i, 0, IAudioSamples.Format.FMT_S16) + 0x8000)>>8)); //TODO Stereo
 						//N.B. We need to decrease the sample rate to 22050Hz
 					}
@@ -115,7 +115,7 @@ public final class TMVEncode implements Runnable {
 			}
 		}
 		Encode enc = new Encode(output, audio_out);
-		File tmvout = new File("//home//david//output.tmv");
+		File tmvout = new File("//home//david//output.tmv"); //fix this
 		
 		srate = (srate == 44100) ? 22050 : srate;
 		
@@ -133,7 +133,12 @@ public final class TMVEncode implements Runnable {
 				buf = new int[64];
 				for (int y = 0; y < 8; y++) {
 					for (int x = 0; x < 8; x++) {
-						buf[(y*8) + x] = cur_frame.getRGB((col * 8) + x, (row * 8) + y); //TODO 4*4 mode
+						if (yuv) { //encode as yuv
+							buf[(y*8) + x] = ColourUtil.convRGBtoYUV(cur_frame.getRGB((col * 8) + x, (row * 8) + y));
+						}
+						else { //encode as rgb
+							buf[(y*8) + x] = cur_frame.getRGB((col * 8) + x, (row * 8) + y);
+						}
 					}
 				}
 				pool.add(new UCell(buf, (row*40) + col));
